@@ -1,1 +1,57 @@
 
+<!-- MODULE LISTE DE COURSES -->
+<div class="shopping-list-module" id="shopping-list-1">
+  <style>
+    .shopping-list-module {
+      background: #fff;
+      max-width: 600px;
+      margin: 20px auto;
+      font-family: "Segoe UI", Roboto, sans-serif;
+      border: 1px solid #e3e8ef;
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .shopping-list-module h3 {
+      margin:0 0 10px 0; font-size:16px; color:#4b5563;
+    }
+    .shopping-list-module ul { list-style:none; padding:0; margin:0; }
+    .shopping-list-module li {
+      padding:6px 0; border-bottom:1px solid #f3f4f6;
+      font-size:14px; display:flex; justify-content:space-between;
+    }
+    .shopping-list-module li:last-child { border-bottom:0; }
+    .shopping-list-module button.clear-btn {
+      margin-top:10px; background:#ef4444; color:white; border:none;
+      padding:8px 12px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; transition:0.2s;
+    }
+    .shopping-list-module button.clear-btn:hover { opacity:0.9; transform:scale(1.02); }
+  </style>
+
+  <h3>🛒 Liste de courses</h3>
+  <ul id="shopping-ul-1"></ul>
+  <button class="clear-btn" id="clearList-1">Vider la liste</button>
+
+  <script>
+    const shoppingUl1 = document.getElementById("shopping-ul-1");
+    const clearBtn1 = document.getElementById("clearList-1");
+
+    function renderShoppingList1() {
+      const list = JSON.parse(localStorage.getItem("listeDeCourses-1") || "[]");
+      shoppingUl1.innerHTML = "";
+      list.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} : ${item.total} ${item.unit}`;
+        shoppingUl1.appendChild(li);
+      });
+    }
+
+    function clearShoppingList1() {
+      localStorage.removeItem("listeDeCourses-1");
+      renderShoppingList1();
+    }
+
+    clearBtn1.addEventListener("click", clearShoppingList1);
+    renderShoppingList1();
+  </script>
+</div>
