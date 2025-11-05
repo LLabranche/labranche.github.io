@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Gâteau au chocolat moelleux</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <nav class="bg-white shadow mb-6">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-extrabold text-blue-600">Mes Recettes</h1>
+      <div class="flex gap-3">
+        <a href="index.html" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Liste des recettes</a>
+        <a href="liste-course.html" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Liste de courses</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto p-6 bg-white rounded shadow">
+    <section class="hero rounded overflow-hidden mb-4">
+      <img src="https://images.unsplash.com/photo-1601972599720-b6f7a5f4b4a0?auto=format&fit=crop&w=1200&q=60" alt="Gâteau au chocolat" />
+    </section>
+
+    <header class="mb-4">
+      <h2 class="text-3xl font-bold">Gâteau au chocolat moelleux</h2>
+      <div class="mt-2 flex gap-2">
+        <span class="tag">dessert</span>
+        <span class="tag">chocolat</span>
+      </div>
+    </header>
+
+    <!-- MODULE INGREDIENTS -->
+    <div class="ingredients-module" id="ingredients-module-1">
+      <style>
+        .ingredients-module {
+          background: #f9fafc;
+          border-radius: 12px;
+          padding: 0;
+          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          max-width: 600px;
+          margin: 20px auto;
+          font-family: "Segoe UI", Roboto, sans-serif;
+          overflow: hidden;
+          border: 1px solid #e3e8ef;
+        }
+        .ingredients-module .header {
+          background: linear-gradient(90deg, #4f46e5, #3b82f6);
+          color: white;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 14px 18px;
+        }
+        .ingredients-module .title { font-size: 18px; font-weight: bold; }
+        .ingredients-module .subtitle { font-size: 13px; opacity: 0.9; }
+        .ingredients-module .controls input {
+          width: 70px; padding: 6px; border-radius: 6px;
+          border: 1px solid #ddd; outline: none; font-size: 14px;
+          text-align: center; color: black;
+        }
+        .ingredients-module .controls input:focus {
+          border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
+        }
+        .ingredients-module table { width:100%; border-collapse: collapse; margin:0; background:white; }
+        .ingredients-module th {
+          text-align:left; background:#eef2ff; color:#374151; padding:10px;
+          font-size:14px; border-bottom:2px solid #dbeafe;
+        }
+        .ingredients-module td {
+          padding:10px; border-bottom:1px solid #f3f4f6; font-size:14px; color:#111827;
+        }
+        .ingredients-module tr:hover td { background: #f9fafb; }
+        .ingredients-module td.right { text-align:right; }
+        .ingredients-module td.unit { color:#6b7280; font-size:13px; }
+        .ingredients-module .actions { padding:14px 18px; background:#fff; text-align:right; }
+        .ingredients-module button.add-btn {
+          background: linear-gradient(90deg,#10b981,#059669); color:white;
+          border:none; padding:10px 16px; font-size:14px; font-weight:600;
+          border-radius:8px; cursor:pointer; transition:0.2s;
+        }
+        .ingredients-module button.add-btn:hover { opacity:0.9; transform:scale(1.02); }
+        .ingredients-module .msg { font-size:13px; color:#047857; margin-top:6px; text-align:right; }
+      </style>
+
+      <div class="header">
+        <div>
+          <div class="title">🧂 Recette</div>
+          <div class="subtitle">Ajuste les quantités selon le nombre de personnes</div>
+        </div>
+        <div class="controls">
+          <label for="people-count-1">Personnes</label>
+          <input id="people-count-1" type="number" min="1" value="2">
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Ingrédient</th>
+            <th>Qté / pers.</th>
+            <th>Total</th>
+            <th>Unité</th>
+          </tr>
+        </thead>
+        <tbody id="ingredients-body-1"></tbody>
+      </table>
+
+      <div class="actions">
+        <button class="add-btn" id="addToList-1">➕ Ajouter à la liste de courses</button>
+        <div class="msg" id="addMsg-1"></div>
+      </div>
+
+      <script>
+        const ingredientsData1 = [
+          { name: "Chocolat noir", qtyPerPerson: 50, unit: "g" },
+          { name: "Beurre", qtyPerPerson: 25, unit: "g" },
+          { name: "Sucre", qtyPerPerson: 25, unit: "g" },
+          { name: "Oeufs", qtyPerPerson: 0.5, unit: "" },
+          { name: "Farine", qtyPerPerson: 12.5, unit: "g" }
+        ];
+
+        const tbody1 = document.getElementById("ingredients-body-1");
+        const peopleInput1 = document.getElementById("people-count-1");
+        const addButton1 = document.getElementById("addToList-1");
+        const addMsg1 = document.getElementById("addMsg-1");
+
+        function renderIngredients1() {
+          const people = Math.max(1, Number(peopleInput1.value) || 1);
+          tbody1.innerHTML = "";
+          ingredientsData1.forEach(ing => {
+            const total = ing.qtyPerPerson * people;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${ing.name}</td>
+              <td>${ing.qtyPerPerson}</td>
+              <td class="right">${total}</td>
+              <td class="unit">${ing.unit}</td>
+            `;
+            tbody1.appendChild(row);
+          });
+        }
+
+        function addToShoppingList1() {
+          const people = Math.max(1, Number(peopleInput1.value) || 1);
+          const calculated = ingredientsData1.map(ing => ({
+            name: ing.name,
+            total: ing.qtyPerPerson * people,
+            unit: ing.unit
+          }));
+
+          let currentList = JSON.parse(localStorage.getItem("listeDeCourses-1") || "[]");
+          calculated.forEach(item => {
+            const existing = currentList.find(i => i.name === item.name && i.unit === item.unit);
+            if (existing) existing.total += item.total;
+            else currentList.push(item);
+          });
+
+          localStorage.setItem("listeDeCourses-1", JSON.stringify(currentList));
+          addMsg1.textContent = "✅ Ajouté !";
+          setTimeout(() => (addMsg1.textContent = ""), 2000);
+        }
+
+        peopleInput1.addEventListener("input", renderIngredients1);
+        addButton1.addEventListener("click", addToShoppingList1);
+        renderIngredients1();
+      </script>
+    </div>
+
+    <h3 class="text-xl font-semibold mt-6 mb-2">Étapes</h3>
+    <ol class="list-decimal ml-5 space-y-1">
+      <li>Préchauffer le four à 180°C.</li>
+      <li>Faire fondre le chocolat et le beurre ensemble.</li>
+      <li>Ajouter le sucre puis les œufs un à un.</li>
+      <li>Incorporer la farine.</li>
+      <li>Verser dans un moule beurré et enfourner 20 minutes.</li>
+    </ol>
+  </main>
+</body>
+</html>
