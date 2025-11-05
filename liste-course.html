@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ma liste de courses</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="text-gray-900 bg-gray-50">
+  <nav class="bg-white shadow mb-6">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-extrabold text-green-600">Ma liste de courses</h1>
+      <div class="flex gap-3">
+        <a href="index.html" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Liste des recettes</a>
+        <a href="liste-course.html" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Liste de courses</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MODULE LISTE DE COURSES -->
+  <div class="shopping-list-module" id="shopping-list-1">
+    <style>
+      .shopping-list-module {
+        background: #fff;
+        max-width: 600px;
+        margin: 20px auto;
+        font-family: "Segoe UI", Roboto, sans-serif;
+        border: 1px solid #e3e8ef;
+        border-radius: 12px;
+        padding: 14px 18px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      }
+      .shopping-list-module h3 {
+        margin:0 0 10px 0; font-size:16px; color:#4b5563;
+      }
+      .shopping-list-module ul { list-style:none; padding:0; margin:0; }
+      .shopping-list-module li {
+        padding:6px 0; border-bottom:1px solid #f3f4f6;
+        font-size:14px; display:flex; justify-content:space-between;
+      }
+      .shopping-list-module li:last-child { border-bottom:0; }
+      .shopping-list-module button {
+        margin-top:10px; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:13px; font-weight:600; transition:0.2s;
+      }
+      .shopping-list-module button.clear-btn { background:#ef4444; }
+      .shopping-list-module button.copy-btn { background:#3b82f6; margin-left:8px; }
+      .shopping-list-module button:hover { opacity:0.9; transform:scale(1.02); }
+    </style>
+
+    <h3>🛒 Liste de courses</h3>
+    <ul id="shopping-ul-1"></ul>
+    <div class="flex gap-2">
+      <button class="clear-btn" id="clearList-1">Vider la liste</button>
+      <button class="copy-btn" id="copyList-1">Copier la liste</button>
+    </div>
+
+    <script>
+      const shoppingUl1 = document.getElementById("shopping-ul-1");
+      const clearBtn1 = document.getElementById("clearList-1");
+      const copyBtn1 = document.getElementById("copyList-1");
+
+      function renderShoppingList1() {
+        const list = JSON.parse(localStorage.getItem("listeDeCourses-1") || "[]");
+        shoppingUl1.innerHTML = "";
+        list.forEach(item => {
+          const li = document.createElement("li");
+          li.textContent = `${item.name} : ${item.total} ${item.unit}`;
+          shoppingUl1.appendChild(li);
+        });
+      }
+
+      function clearShoppingList1() {
+        localStorage.removeItem("listeDeCourses-1");
+        renderShoppingList1();
+      }
+
+      function copyShoppingList1() {
+        const list = JSON.parse(localStorage.getItem("listeDeCourses-1") || "[]");
+        if (list.length === 0) {
+          alert('La liste est vide !');
+          return;
+        }
+        const text = list.map(i => `${i.name} : ${i.total} ${i.unit}`).join('\n');
+        navigator.clipboard.writeText(text).then(() => {
+          alert('Liste copiée dans le presse-papiers ✅');
+        }).catch(() => {
+          alert('Erreur lors de la copie de la liste ❌');
+        });
+      }
+
+      clearBtn1.addEventListener("click", clearShoppingList1);
+      copyBtn1.addEventListener("click", copyShoppingList1);
+      renderShoppingList1();
+    </script>
+  </div>
+</body>
+</html>
