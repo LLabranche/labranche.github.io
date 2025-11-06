@@ -1,28 +1,65 @@
 <!doctype html>
 <html lang="fr">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mes recettes</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .card-img { height: 160px; object-fit: cover; }
-    .fade{transition:all .2s ease}
-    a.card-link:hover { transform: scale(1.02); }
+    .card-img {
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .fade {
+      transition: all .2s ease
+    }
+
+    a.card-link:hover {
+      transform: scale(1.02);
+    }
+
+    mark {
+      background: #ffe58a;
+      padding: 0 .15em;
+      border-radius: .15rem;
+    }
   </style>
 </head>
+
 <body class="bg-gray-50 text-gray-900">
   <nav class="bg-white shadow mb-6">
     <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
       <h1 class="text-2xl font-extrabold text-blue-600">Mes Recettes</h1>
       <div class="flex gap-3">
         <a href="index.html" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Liste des recettes</a>
-        <a href="liste-course.html" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Liste de courses</a>
+        <a href="liste-course.html" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Liste de
+          courses</a>
       </div>
     </div>
   </nav>
 
   <div class="max-w-6xl mx-auto p-6">
+    <header class="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div class="flex-1 flex gap-2">
+        <label for="search" class="sr-only">Rechercher</label>
+        <input id="search" type="search" placeholder="Rechercher (titre ou tag)..." aria-label="Recherche"
+          class="w-full px-4 py-2 rounded-md border border-gray-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <button id="clear"
+          class="px-4 py-2 bg-gray-100 border border-gray-200 rounded-md hover:bg-gray-200">Effacer</button>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div id="count" class="text-sm text-gray-600">0 résultats</div>
+      </div>
+    </header>
+
+    <section class="mb-6">
+      <h4 class="text-sm font-medium text-gray-700 mb-2">Filtrer par tag</h4>
+      <div id="tagContainer" class="flex flex-wrap gap-2"></div>
+    </section>
+
     <main id="list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></main>
   </div>
 
@@ -31,7 +68,7 @@
       <img class="card-img w-full" src="" alt="Image recette" />
       <div class="p-4">
         <h3 class="font-bold text-lg">Titre</h3>
-        <p class="text-sm text-gray-500">Tags: <span class="tags"></span></p>
+        <p class="text-xs text-gray-400 mt-2">Tags: <span class="tags"></span></p>
       </div>
     </a>
   </template>
@@ -39,37 +76,146 @@
   <script>
     const listEl = document.querySelector('#list');
     const tpl = document.querySelector('#cardTpl');
+    const searchInput = document.getElementById('search');
+    const tagContainer = document.getElementById('tagContainer');
+    const clearBtn = document.getElementById('clear');
+    const countEl = document.getElementById('count');
 
-    // Exemple de données intégrées dans le code
     const recipes = [
       {
-        id: 'gateau-chocolat',
-        name: "Carré de porc doré & purée d'épinards avec une sauce forestière",
-        tags: ['dessert', 'chocolat'],
-        image: './recettes/images/porc-puree-épinards.png',
-        page: './recettes/porc-puree-épinards.html'
+        id: 'poulet-puree-epinards',
+        name: "Cuisse de poulet dorée & purée d'épinards avec une sauce forestière",
+        tags: ['Poulet', 'Epinards', 'Pommes de terre', 'Champignons'],
+        get location() { return './recettes/' + this.id + '/'; },
+        get image() { return this.location + 'main.webp'; },
+        get page() { return this.location + 'recette.html'; }
+      },
+      {
+        id: 'hachis-boeuf-potimarron',
+        name: "Hachis parmentier de bœuf & potimarron avec du gouda râpé & de la sauge",
+        tags: ['Boeuf', 'Potimarron', 'Pommes de terre', 'Salade'],
+        get location() { return './recettes/' + this.id + '/'; },
+        get image() { return this.location + 'main.webp'; },
+        get page() { return this.location + 'recette.html'; }
       }
     ];
 
-    function render(){
-      listEl.innerHTML='';
-      for(const r of recipes){
+    const tagsSet = new Set();
+    recipes.forEach(r => (r.tags || []).forEach(t => tagsSet.add(t)));
+    const allTags = Array.from(tagsSet).sort();
+
+    for (const tag of allTags) {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'px-3 py-1 text-sm border border-gray-200 rounded-full bg-white hover:bg-gray-100';
+      btn.dataset.tag = tag;
+      btn.textContent = tag;
+      btn.setAttribute('aria-pressed', 'false');
+      tagContainer.appendChild(btn);
+    }
+
+    const activeTags = new Set();
+
+    function renderInitial() {
+      listEl.innerHTML = '';
+      for (const r of recipes) {
         const node = tpl.content.cloneNode(true);
         const link = node.querySelector('a');
         link.href = r.page || '#';
         node.querySelector('img').src = r.image || 'https://via.placeholder.com/800x600?text=Recette';
+        node.querySelector('img').alt = r.name;
         node.querySelector('h3').textContent = r.name;
-        node.querySelector('.tags').textContent = r.tags.join(', ');
+        node.querySelector('.tags').textContent = (r.tags || []).join(', ');
+        const elRoot = node.querySelector('a');
+        elRoot.dataset.tags = (r.tags || []).join(',');
+        elRoot.dataset.title = r.name;
         listEl.appendChild(node);
       }
     }
 
-    render();
+    renderInitial();
+
+    function debounce(fn, wait = 180) {
+      let t;
+      return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), wait); };
+    }
+
+    function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+    function highlightText(el, query) {
+      const q = query.trim();
+      if (!q) return;
+      const re = new RegExp('(' + escapeRegExp(q) + ')', 'ig');
+      const titleEl = el.querySelector('h3');
+      if (titleEl) titleEl.innerHTML = titleEl.textContent.replace(re, '<mark>$1</mark>');
+    }
+    function removeHighlight(el) {
+      const titleEl = el.querySelector('h3');
+      if (titleEl) titleEl.innerHTML = titleEl.textContent;
+    }
+
+    function applyFilters() {
+      const q = searchInput.value.trim().toLowerCase();
+      const cards = Array.from(document.querySelectorAll('#list .card-link'));
+      let visible = 0;
+
+      for (const card of cards) {
+        const title = (card.dataset.title || '').toLowerCase();
+        const tags = (card.dataset.tags || '').split(',').map(s => s.trim()).filter(Boolean);
+
+        const matchesQuery = q === '' || title.includes(q) || tags.some(t => t.includes(q));
+        const matchesTags = activeTags.size === 0 || Array.from(activeTags).every(t => tags.includes(t));
+
+        const show = matchesQuery && matchesTags;
+        card.style.display = show ? '' : 'none';
+
+        if (show) {
+          visible++;
+          if (q) highlightText(card, q);
+          else removeHighlight(card);
+        } else {
+          removeHighlight(card);
+        }
+      }
+
+      countEl.textContent = visible + (visible <= 1 ? ' résultat' : ' résultats');
+    }
+
+    const debouncedApply = debounce(applyFilters, 160);
+    searchInput.addEventListener('input', debouncedApply);
+
+    tagContainer.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const tag = btn.dataset.tag;
+      if (activeTags.has(tag)) {
+        activeTags.delete(tag);
+        btn.classList.remove('bg-blue-600', 'text-white', 'border-transparent');
+        btn.classList.add('bg-white', 'border-gray-200');
+        btn.setAttribute('aria-pressed', 'false');
+      } else {
+        activeTags.add(tag);
+        btn.classList.add('bg-blue-600', 'text-white', 'border-transparent');
+        btn.classList.remove('bg-white', 'border-gray-200');
+        btn.setAttribute('aria-pressed', 'true');
+      }
+      applyFilters();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      activeTags.clear();
+      document.querySelectorAll('#tagContainer button').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white', 'border-transparent');
+        btn.classList.add('bg-white', 'border-gray-200');
+        btn.setAttribute('aria-pressed', 'false');
+      });
+      applyFilters();
+      searchInput.focus();
+    });
+
+    applyFilters();
   </script>
 </body>
+
 </html>
-
-
-
-
-
