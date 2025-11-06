@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mes recettes</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .hero { max-height: 380px; overflow: hidden; }
+    .hero img { width:100%; height:100%; object-fit:cover; display:block; border-radius:12px; }
+    .step-container { display:flex; gap:16px; align-items:center; margin-bottom:16px; }
+    .step-img { width:128px; height:96px; object-fit:cover; border-radius:8px; flex-shrink:0; }
+    .step-card { background:#ffffff; padding:10px; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+    .step-card p { margin:0; }
+    .pantry-table th { text-align:left; padding:8px; background:#ebf3ff; color:#1e3a8a; }
+    .pantry-table td { padding:8px; border-bottom:1px solid #e0e7ff; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+  <nav class="bg-white shadow mb-6">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-extrabold text-blue-600">Mes Recettes</h1>
+      <div class="flex gap-3">
+        <a href="../../index.html" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Liste des recettes</a>
+        <a href="../../liste-course.html" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Liste de courses</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-4xl mx-auto p-6 bg-white rounded shadow">
+    <section class="hero mb-6">
+      <img src="./main.webp"/>
+    </section>
+
+    <header class="mb-4">
+      <h2 class="text-3xl font-bold">Cuisse de poulet dorée & purée d'épinards avec une sauce forestière</h2>
+    </header>
+
+    <!-- MODULE INGREDIENTS -->
+    <div class="bg-white border border-blue-100 rounded-lg p-4 mb-6 shadow-sm">
+      <div class="flex justify-between items-center mb-3">
+        <div>
+          <h3 class="text-lg font-semibold text-blue-700">🧂 Ingrédients</h3>
+          <p class="text-sm text-gray-600">Ajuste les quantités selon le nombre de personnes</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <label for="people-count-1" class="text-sm">Personnes :</label>
+          <input id="people-count-1" type="number" min="1" value="2" class="border border-gray-300 rounded p-1 w-16 text-center" />
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border border-gray-200 rounded-lg overflow-hidden">
+          <thead class="bg-blue-50 text-blue-800">
+            <tr>
+              <th class="px-3 py-2 text-left">Ingrédient</th>
+              <th class="px-3 py-2 text-left">Qté / pers.</th>
+              <th class="px-3 py-2 text-left">Total</th>
+              <th class="px-3 py-2 text-left">Unité</th>
+            </tr>
+          </thead>
+          <tbody id="ingredients-body-1" class="divide-y divide-gray-100"></tbody>
+        </table>
+      </div>
+
+      <div class="text-right mt-3">
+        <button id="addToList-1" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">➕ Ajouter à la liste de courses</button>
+        <span id="addMsg-1" class="text-green-600 text-sm ml-2"></span>
+      </div>
+
+      <script>
+        const ingredientsData1 = [
+          { name: "Pommes de terre", qtyPerPerson: 250, unit: "g" },
+          { name: "Oignon", qtyPerPerson: 0.5, unit: "pièce" },
+          { name: "Épinards", qtyPerPerson: 100, unit: "g" },
+          { name: "Crème liquide", qtyPerPerson: 25, unit: "cl" },
+          { name: "Gousse d'ail", qtyPerPerson: 0.5, unit: "pièce" },
+          { name: "Champignons de Paris", qtyPerPerson: 65, unit: "g" },
+          { name: "Cuisse de poulet", qtyPerPerson: 1, unit: "pièce" }            
+        ];
+
+        const tbody1 = document.getElementById("ingredients-body-1");
+        const peopleInput1 = document.getElementById("people-count-1");
+        const addButton1 = document.getElementById("addToList-1");
+        const addMsg1 = document.getElementById("addMsg-1");
+
+        function renderIngredients1() {
+          const people = Math.max(1, Number(peopleInput1.value) || 1);
+          tbody1.innerHTML = "";
+          ingredientsData1.forEach(ing => {
+            const total = ing.qtyPerPerson * people;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td class='px-3 py-2'>${ing.name}</td>
+              <td class='px-3 py-2'>${ing.qtyPerPerson}</td>
+              <td class='px-3 py-2'>${total}</td>
+              <td class='px-3 py-2 text-gray-500'>${ing.unit}</td>
+            `;
+            tbody1.appendChild(row);
+          });
+        }
+
+        function addToShoppingList1() {
+          const people = Math.max(1, Number(peopleInput1.value) || 1);
+          const calculated = ingredientsData1.map(ing => ({
+            name: ing.name,
+            total: ing.qtyPerPerson * people,
+            unit: ing.unit
+          }));
+
+          let currentList = JSON.parse(localStorage.getItem("listeDeCourses-1") || "[]");
+          calculated.forEach(item => {
+            const existing = currentList.find(i => i.name === item.name && i.unit === item.unit);
+            if (existing) existing.total += item.total;
+            else currentList.push(item);
+          });
+
+          localStorage.setItem("listeDeCourses-1", JSON.stringify(currentList));
+          addMsg1.textContent = "✅ Ajouté !";
+          setTimeout(() => (addMsg1.textContent = ""), 2000);
+        }
+
+        peopleInput1.addEventListener("input", () => { renderIngredients1(); renderPantry(); });
+        addButton1.addEventListener("click", addToShoppingList1);
+        renderIngredients1();
+      </script>
+    </div>
+
+    <!-- Tableau des ingrédients à avoir chez soi harmonisé -->
+    <section class="mt-6">
+      <h3 class="text-xl font-semibold mb-3 text-blue-700">Ingrédients à avoir chez soi</h3>
+      <div class="overflow-x-auto">
+        <table id="pantry-table" class="pantry-table w-full border border-blue-100 rounded-lg overflow-hidden shadow-sm">
+          <thead class="bg-blue-50 text-blue-800">
+            <tr>
+              <th class="px-3 py-2">Ingrédient</th>
+              <th class="px-3 py-2">Quantité</th>
+            </tr>
+          </thead>
+          <tbody id="pantry-body" class="bg-white divide-y divide-blue-50">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <h3 class="text-xl font-semibold mb-2">Étapes</h3>
+    <ol class="list-decimal ml-5 space-y-4">
+      <li>
+        <div class="step-container">
+          <img src="./step1.webp" class="step-img">
+          <div class="step-card">
+            <p>• Veillez à bien respecter les quantités indiquées à gauche pour préparer votre recette.<br>
+            • Préchauffez le four à 230°C (210°C chaleur tournante).<br>
+            • Faites chauffer un filet d'huile d'olive dans une sauteuse à feu moyen-vif et dorez le poulet 5-6 min côté peau.<br>
+            • Disposez le poulet sur une plaque avec papier sulfurisé et réservez la sauteuse. Salez et poivrez. Enfournez 30-35 min.</p>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="step-container">
+          <img src="./step2.webp" class="step-img">
+          <div class="step-card">
+            <p>• Épluchez les pommes de terre et coupez-les en dés de 2 cm.<br>
+            • Mettez-les dans une casserole avec une pincée de sel et de l’eau à hauteur.<br>
+            • Portez à ébullition et faites cuire 15-17 min.<br>
+            • Égouttez-les et réservez dans la passoire.</p>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="step-container">
+          <img src="./step3.webp" class="step-img">
+          <div class="step-card">
+            <p>• Préparez le bouillon avec de l'eau chaude.<br>
+            • Ciselez l'ail et coupez l'oignon en fines demi-lunes.<br>
+            • Nettoyez les champignons et coupez-les en fines tranches.<br>
+            • Lavez et hachez grossièrement les épinards.</p>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="step-container">
+          <img src="./step4.webp" class="step-img">
+          <div class="step-card">
+            <p>• Faites chauffer un filet d'huile dans la sauteuse de l'étape 1.<br>
+            • Faites revenir champignons et oignon 7-8 min.<br>
+            • Ajoutez l'ail, déglacez avec le vinaigre, puis ajoutez le bouillon et la crème. Poivrez et portez à frémissement 1-2 min.<br>
+            • Réservez la sauce nappante.</p>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="step-container">
+          <img src="./step5.webp" class="step-img">
+          <div class="step-card">
+            <p>• Faites fondre le beurre dans la casserole des pommes de terre.<br>
+            • Ajoutez les épinards et faites-les revenir 2-3 min.<br>
+            • Ajoutez les dés de pommes de terre, salez, poivrez et réduisez en purée avec un presse-purée.<br>
+            • Faites réchauffer 2-3 min avant de servir.</p>
+          </div>
+        </div>
+      </li>
+      <li>
+        <div class="step-container">
+          <img src="./step6.webp" class="step-img">
+          <div class="step-card">
+            <p>• Réchauffez la sauce 1-2 min si trop froide.<br>
+            • Servez la purée au centre des assiettes.<br>
+            • Disposez les cuisses dessus et arrosez de sauce.<br>
+            Astuce : utilisez un peu de jus de cuisson du poulet pour le centre de la purée.</p>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <script>
+      const pantryData = [
+        { name: 'Huile d\'olive', qtyPerPerson: 1, unit: 'cs' },
+        { name: 'Vinaigre de vin rouge ou de cidre', qtyPerPerson: 0.5, unit: 'cc' },
+        { name: 'Lait', qtyPerPerson: 1, unit: 'cs' },
+        { name: 'Bouillon de volaille', qtyPerPerson: 40, unit: 'ml' },
+        { name: 'Beurre', qtyPerPerson: 1, unit: 'cc' }
+      ];
+
+      const pantryBody = document.getElementById('pantry-body');
+      const peopleInput = document.getElementById('people-count-1');
+
+      function renderPantry() {
+        const people = Math.max(1, Number(peopleInput.value) || 1);
+        pantryBody.innerHTML = '';
+        pantryData.forEach(item => {
+          const tr = document.createElement('tr');
+          let qtyText = '—';
+          if (item.qtyPerPerson !== null && !isNaN(item.qtyPerPerson)) {
+            const total = item.qtyPerPerson * people;
+            qtyText = (total % 1 === 0) ? total : Math.round(total * 100) / 100;
+            if (item.unit) qtyText += ' ' + item.unit;
+          }
+          tr.innerHTML = `<td class="px-3 py-2">${item.name}</td><td class="px-3 py-2">${qtyText}</td>`;
+          pantryBody.appendChild(tr);
+        });
+      }
+
+      if (!peopleInput._pantryListenerAdded) {
+        peopleInput.addEventListener('input', renderPantry);
+        peopleInput._pantryListenerAdded = true;
+      }
+
+      renderPantry();
+    </script>
+  </main>
+</body>
+</html>
